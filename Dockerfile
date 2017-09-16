@@ -8,9 +8,9 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.license="MIT" \
       org.label-schema.name="ZNC with SASL and TOR support" \
       org.label-schema.description="This docker container was designed as a simple to use TOR with ZNC bouncer service for use on Freenode IRC server. This can however easily be adapted to be used on any server whether you require TOR or not." \
-      org.label-schema.url="https://manage.netspeedy.co.uk/git/netspeedy/docker-torznc" \
+      org.label-schema.url="https://github.com/netspeedy/docker-torznc" \
       org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://manage.netspeedy.co.uk/git/netspeedy/docker-torznc.git" \
+      org.label-schema.vcs-url="https://github.com/netspeedy/docker-torznc.git" \
       org.label-schema.version=$VERSION \
 org.label-schema.vcs-type="Git"
 
