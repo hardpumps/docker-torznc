@@ -1,0 +1,13 @@
+#!/bin/sh
+
+##
+## Makes sure that oidentd is configured and running
+##
+
+read pid cmd state ppid pgrp session tty_nr tpgid rest < /proc/self/stat
+trap "kill -TERM -$pgrp; exit" EXIT TERM KILL SIGKILL SIGTERM SIGQUIT
+
+## Create the pseudo log file to point to stdout
+ln -sf /proc/1/fd/1 /var/log/oidentd.log
+
+exec /usr/sbin/oidentd -i -mf -P $(ip route show 0.0.0.0/0 | awk '/^default via /{print $3}') -u nobody -g nobody  >>/var/log/oidentd.log 2>&1

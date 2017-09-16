@@ -1,0 +1,26 @@
+---
+version: '2'
+services:
+  tor-znc:
+    image: netspeedy/tor-znc
+    container_name: tor-znc 
+    volumes:
+      - ./appdata/tor-znc:/etc/znc     
+    networks:
+      - private
+      - nginx-proxy
+    ports:
+      - 113:113
+      - 9082:9082
+      - 6697:6697
+    restart: always
+    environment:
+      - TRUSTED_PROXY=2.2.2.2
+
+networks:
+  nginx-proxy:
+    external:
+      name: nginx-proxy
+  private:
+    external:
+      name: private 

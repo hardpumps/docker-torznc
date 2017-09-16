@@ -1,0 +1,20 @@
+#!/bin/bash
+
+##
+## Makes sure that TOR is running
+##
+
+read pid cmd state ppid pgrp session tty_nr tpgid rest < /proc/self/stat
+trap "kill -TERM -$pgrp; exit" EXIT TERM KILL SIGKILL SIGTERM SIGQUIT
+
+## Create the pseudo log file to point to stdout
+ln -sf /proc/1/fd/1 /var/log/tor.log
+
+## make sure dir exists
+if [ ! -d /var/run/tor ]; then mkdir -p /var/run/tor; fi 
+
+## make sure permissions is correct
+chown -R tor:tor /var/run/tor /var/lib/tor
+
+## runs tor daemon
+exec su -s /bin/bash tor -c '/usr/bin/tor -f /etc/tor/torrc' >>/var/log/tor.log 2>&1

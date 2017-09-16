@@ -1,0 +1,45 @@
+#!/bin/bash
+
+##
+## Makes sure that ZNC is configured and running
+##
+
+: ${ZNC_TRUSTED_PROXY:=172.16.0.0/12}
+
+read pid cmd state ppid pgrp session tty_nr tpgid rest < /proc/self/stat
+trap "kill -TERM -$pgrp; exit" EXIT TERM KILL SIGKILL SIGTERM SIGQUIT
+
+## Create the pseudo log file to point to stdout
+ln -sf /proc/1/fd/1 /var/log/znc.log
+
+## create znc config dir
+if [ ! -d /etc/znc/configs ]; then
+        mkdir -p /etc/znc/configs
+fi
+
+## move znc config file
+if [ -f /usr/src/znc.conf ]; then
+        mv /usr/src/znc.conf /etc/znc/configs
+fi
+
+## fix permissions
+if [ -d /etc/znc ]; then
+        chown -R znc:znc /etc/znc
+fi
+
+## create run pid dir
+if [ ! -d /var/run/znc ]; then
+        mkdir -p /var/run/znc
+        chown -R znc:znc /var/run/znc
+fi
+
+## create pem file
+if [ -f /etc/znc/znc.pem ]; then 
+	sed -i "s:^#\(TrustedProxy =\)\(.*\):\1 ${ZNC_TRUSTED_PROXY}:" /etc/znc/configs/znc.conf
+	su -s /bin/bash znc -c '/usr/bin/proxychains /usr/bin/znc --datadir=/etc/znc -f' >>/var/log/znc.log 2>&1
+else
+	sed -i "s:^#\(TrustedProxy =\)\(.*\):\1 ${ZNC_TRUSTED_PROXY}:" /etc/znc/configs/znc.conf
+	su -s /bin/bash znc -c '/usr/bin/znc --datadir=/etc/znc --makepem' >>/var/log/znc.log 2>&1
+	su -s /bin/bash znc -c '/usr/bin/proxychains /usr/bin/znc --datadir=/etc/znc -f' >>/var/log/znc.log 2>&1
+fi	
+
